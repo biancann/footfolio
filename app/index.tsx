@@ -16,9 +16,14 @@ export default function WelcomeScreen() {
   const account = useActiveAccount();
 
   useEffect(() => {
-    if (account) {
+    // if (account) {
+    //   router.replace("/(tabs)");
+    // }
+
+    // For development purposes
+    setTimeout(() => {
       router.replace("/(tabs)");
-    }
+    }, 600);
   }, [account]);
 
   return (

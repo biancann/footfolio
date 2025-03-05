@@ -18,34 +18,34 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="index"
 				options={{
-					title: "Connect",
+					title: "Home",
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon
-							name={focused ? "wallet" : "wallet-outline"}
+							name={focused ? "home" : "home-outline"}
 							color={color}
 						/>
 					),
 				}}
 			/>
 			<Tabs.Screen
-				name="read"
+				name="walk"
 				options={{
-					title: "Read",
+					title: "Walk",
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon
-							name={focused ? "reader" : "reader-outline"}
+							name={focused ? "walk" : "walk-outline"}
 							color={color}
 						/>
 					),
 				}}
 			/>
 			<Tabs.Screen
-				name="write"
+				name="rank"
 				options={{
-					title: "Write",
+					title: "Rank",
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon
-							name={focused ? "code-slash" : "code-slash-outline"}
+							name={focused ? "medal" : "medal-outline"}
 							color={color}
 						/>
 					),
