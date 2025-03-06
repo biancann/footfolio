@@ -9,6 +9,7 @@ import { useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { contract } from "@/constants/thirdweb";
 import ViewShot from "react-native-view-shot";
 import { prepareContractCall } from "thirdweb";
+import { uploadToIPFS, uploadMetadataToIPFS } from "@/utils/ipfs";
 
 interface Coordinate {
   latitude: number;
@@ -189,77 +190,6 @@ export default function WalkingScreen() {
       } catch (error) {
         console.error("Error capturing preview:", error);
       }
-    }
-  };
-
-  // Upload image to IPFS
-  const uploadToIPFS = async (uri: string) => {
-    try {
-      const pinataJWT = process.env.EXPO_PUBLIC_PINATA_JWT;
-      if (!pinataJWT) {
-        throw new Error("Pinata JWT token is not configured");
-      }
-
-      // Create form data with the correct content type
-      const formData = new FormData();
-      formData.append("file", {
-        uri: uri,
-        type: "image/png",
-        name: "walking-path.png",
-      } as any);
-
-      const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${pinataJWT}`,
-          "Accept": "application/json",
-          "Content-Type": "multipart/form-data",
-        },
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Pinata API error:", errorText);
-        throw new Error(`Failed to upload to IPFS: ${res.status} ${res.statusText}`);
-      }
-
-      const data = await res.json();
-      return `ipfs://${data.IpfsHash}`;
-    } catch (error) {
-      console.error("Error uploading to IPFS:", error);
-      throw error;
-    }
-  };
-
-  // Upload metadata to IPFS
-  const uploadMetadataToIPFS = async (metadata: any) => {
-    try {
-      const pinataJWT = process.env.EXPO_PUBLIC_PINATA_JWT;
-      if (!pinataJWT) {
-        throw new Error("Pinata JWT token is not configured");
-      }
-
-      const res = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${pinataJWT}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(metadata),
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Pinata API error:", errorText);
-        throw new Error(`Failed to upload metadata to IPFS: ${res.status} ${res.statusText}`);
-      }
-
-      const data = await res.json();
-      return `ipfs://${data.IpfsHash}`;
-    } catch (error) {
-      console.error("Error uploading metadata to IPFS:", error);
-      throw error;
     }
   };
 
