@@ -10,6 +10,7 @@ import { contract } from "@/constants/thirdweb";
 import ViewShot from "react-native-view-shot";
 import { prepareContractCall } from "thirdweb";
 import { uploadToIPFS, uploadMetadataToIPFS } from "@/utils/ipfs";
+import Svg, { Path } from "react-native-svg";
 
 interface Coordinate {
   latitude: number;
@@ -38,6 +39,8 @@ export default function WalkingScreen() {
     latitudeDelta: number;
     longitudeDelta: number;
   } | null>(null);
+  const [previewBackground, setPreviewBackground] = useState<'solid' | 'dimmed'>('dimmed');
+  const [previewBackgroundColor, setPreviewBackgroundColor] = useState('#FFFFFF');
 
   // Request location permissions and get initial location
   useEffect(() => {
@@ -151,37 +154,41 @@ export default function WalkingScreen() {
   const capturePreview = async () => {
     if (viewShotRef.current?.capture) {
       try {
-        // Get the current map region
-        const region = await new Promise<{
-          latitude: number;
-          longitude: number;
-          latitudeDelta: number;
-          longitudeDelta: number;
-        }>((resolve) => {
-          if (mapRef.current) {
-            // Use the last known coordinates or current location
-            const lastCoord = coordinates[coordinates.length - 1];
-            resolve({
-              latitude: lastCoord?.latitude || location?.coords.latitude || 0,
-              longitude: lastCoord?.longitude || location?.coords.longitude || 0,
-              latitudeDelta: 0.005,
-              longitudeDelta: 0.005,
-            });
-          } else {
-            resolve({
-              latitude: location?.coords.latitude || 0,
-              longitude: location?.coords.longitude || 0,
-              latitudeDelta: 0.005,
-              longitudeDelta: 0.005,
-            });
-          }
+        if (coordinates.length === 0) {
+          console.error("No coordinates to capture");
+          return;
+        }
+
+        // Calculate bounds of the path
+        const bounds = coordinates.reduce((acc, coord) => ({
+          minLat: Math.min(acc.minLat, coord.latitude),
+          maxLat: Math.max(acc.maxLat, coord.latitude),
+          minLng: Math.min(acc.minLng, coord.longitude),
+          maxLng: Math.max(acc.maxLng, coord.longitude),
+        }), {
+          minLat: coordinates[0].latitude,
+          maxLat: coordinates[0].latitude,
+          minLng: coordinates[0].longitude,
+          maxLng: coordinates[0].longitude,
         });
+
+        // Add padding to ensure path is fully visible
+        const latPadding = (bounds.maxLat - bounds.minLat) * 0.2;
+        const lngPadding = (bounds.maxLng - bounds.minLng) * 0.2;
+
+        // Calculate the region that will show the entire path
+        const region = {
+          latitude: (bounds.minLat + bounds.maxLat) / 2,
+          longitude: (bounds.minLng + bounds.maxLng) / 2,
+          latitudeDelta: Math.max((bounds.maxLat - bounds.minLat) + latPadding, 0.001),
+          longitudeDelta: Math.max((bounds.maxLng - bounds.minLng) + lngPadding, 0.001),
+        };
 
         // Update the preview map region
         setPreviewRegion(region);
 
         // Wait for the map to render
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Increased wait time for better rendering
 
         const uri = await viewShotRef.current.capture();
         console.log("Captured preview URI:", uri);
@@ -205,6 +212,8 @@ export default function WalkingScreen() {
 
       // Upload image to IPFS
       const imageUri = await uploadToIPFS(previewUri);
+
+      console.log("Image URI:", imageUri);
 
       // Create metadata
       const metadata = {
@@ -230,6 +239,8 @@ export default function WalkingScreen() {
       // Upload metadata to IPFS
       const metadataUri = await uploadMetadataToIPFS(metadata);
 
+      console.log("Metadata URI:", metadataUri);
+
       const transaction = prepareContractCall({
         contract,
         method: "function mint(string token, string tokenURI)",
@@ -247,6 +258,61 @@ export default function WalkingScreen() {
 
   // Available path colors
   const colors = ["#00ff00", "#ff0000", "#0000ff", "#ffff00", "#ff00ff"];
+
+  // Add this new function to handle background changes
+  const handleBackgroundChange = async (type: 'solid' | 'dimmed') => {
+    setPreviewBackground(type);
+    // Wait for state to update and re-render
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await capturePreview();
+  };
+
+  // Add this new function to handle background color changes
+  const handleBackgroundColorChange = async (color: string) => {
+    setPreviewBackgroundColor(color);
+    // Wait for state to update and re-render
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await capturePreview();
+  };
+
+  // Update the normalizeCoordinates function
+  const normalizeCoordinates = (coordinates: Coordinate[]) => {
+    if (coordinates.length === 0) return [];
+
+    // Find the bounds
+    const bounds = coordinates.reduce((acc, coord) => ({
+      minLat: Math.min(acc.minLat, coord.latitude),
+      maxLat: Math.max(acc.maxLat, coord.latitude),
+      minLng: Math.min(acc.minLng, coord.longitude),
+      maxLng: Math.max(acc.maxLng, coord.longitude),
+    }), {
+      minLat: coordinates[0].latitude,
+      maxLat: coordinates[0].latitude,
+      minLng: coordinates[0].longitude,
+      maxLng: coordinates[0].longitude,
+    });
+
+    // Calculate center point
+    const centerLat = (bounds.maxLat + bounds.minLat) / 2;
+    const centerLng = (bounds.maxLng + bounds.minLng) / 2;
+
+    // Calculate the range
+    const latRange = bounds.maxLat - bounds.minLat || 0.0001; // Prevent division by zero
+    const lngRange = bounds.maxLng - bounds.minLng || 0.0001;
+
+    // Use the larger range to maintain aspect ratio
+    const range = Math.max(latRange, lngRange);
+
+    // Set canvas size with padding
+    const size = 700; // Slightly smaller than 800 to ensure padding
+    const scale = size / range;
+
+    // Normalize coordinates to fit in the canvas
+    return coordinates.map(coord => ({
+      x: 400 + ((coord.longitude - centerLng) * scale),
+      y: 400 + ((centerLat - coord.latitude) * scale), // Note the inversion here
+    }));
+  };
 
   return (
     <SafeAreaProvider>
@@ -291,35 +357,67 @@ export default function WalkingScreen() {
             {/* Hidden ViewShot for capturing */}
             <View style={{ position: 'absolute', opacity: 0, width: 800, height: 800, overflow: 'hidden' }}>
               <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0, width: 800, height: 800 }}>
-                <View style={{ width: 800, height: 800, backgroundColor: '#000' }}>
-                  <MapView
-                    provider={Platform.select({
-                      ios: undefined,
-                      android: PROVIDER_GOOGLE,
-                    })}
-                    showsUserLocation={false}
-                    followsUserLocation={false}
-                    showsMyLocationButton={false}
-                    showsCompass={false}
-                    loadingEnabled={false}
-                    initialRegion={previewRegion || {
-                      latitude: location?.coords.latitude || 0,
-                      longitude: location?.coords.longitude || 0,
-                      latitudeDelta: 0.005,
-                      longitudeDelta: 0.005,
-                    }}
-                    style={StyleSheet.absoluteFill}
-                    mapType="standard"
-                    userInterfaceStyle="dark"
-                  >
-                    {coordinates.length > 0 && (
-                      <Polyline
-                        coordinates={coordinates}
-                        strokeColor={pathColor}
-                        strokeWidth={3}
-                      />
-                    )}
-                  </MapView>
+                <View style={{
+                  width: 800,
+                  height: 800,
+                  backgroundColor: previewBackground === 'solid' ? previewBackgroundColor : '#000',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  {previewBackground === 'dimmed' ? (
+                    <>
+                      <MapView
+                        provider={Platform.select({
+                          ios: undefined,
+                          android: PROVIDER_GOOGLE,
+                        })}
+                        showsUserLocation={false}
+                        followsUserLocation={false}
+                        showsMyLocationButton={false}
+                        showsCompass={false}
+                        loadingEnabled={false}
+                        region={previewRegion || {
+                          latitude: location?.coords.latitude || 0,
+                          longitude: location?.coords.longitude || 0,
+                          latitudeDelta: 0.005,
+                          longitudeDelta: 0.005,
+                        }}
+                        style={StyleSheet.absoluteFill}
+                        mapType="standard"
+                        userInterfaceStyle="dark"
+                      >
+                        {coordinates.length > 0 && (
+                          <Polyline
+                            coordinates={coordinates}
+                            strokeColor={pathColor}
+                            strokeWidth={5}
+                          />
+                        )}
+                      </MapView>
+                      <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)' }]} />
+                    </>
+                  ) : (
+                    <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center' }]}>
+                      <Svg width={800} height={800} viewBox="0 0 800 800">
+                        {coordinates.length > 0 && (
+                          <>
+                            <Path
+                              d={normalizeCoordinates(coordinates).reduce((path, point, index) => {
+                                return index === 0
+                                  ? `M ${point.x} ${point.y}`
+                                  : `${path} L ${point.x} ${point.y}`;
+                              }, '')}
+                              stroke={pathColor}
+                              strokeWidth={5}
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </>
+                        )}
+                      </Svg>
+                    </View>
+                  )}
                 </View>
               </ViewShot>
             </View>
@@ -404,6 +502,30 @@ export default function WalkingScreen() {
                   resizeMode="contain"
                 />
               )}
+              <View className="flex-row justify-between items-center mb-4">
+                <TouchableOpacity
+                  onPress={() => handleBackgroundChange(previewBackground === 'solid' ? 'dimmed' : 'solid')}
+                  className="bg-dark-700 px-4 py-2 rounded-full"
+                >
+                  <Text className="text-white">
+                    {previewBackground === 'solid' ? 'Show Map' : 'Solid Background'}
+                  </Text>
+                </TouchableOpacity>
+                {previewBackground === 'solid' && (
+                  <View className="flex-row gap-2">
+                    {['#FFFFFF', '#000000', '#1A1A1A'].map((color) => (
+                      <TouchableOpacity
+                        key={color}
+                        onPress={() => handleBackgroundColorChange(color)}
+                        className={`w-8 h-8 rounded-full ${
+                          previewBackgroundColor === color ? "border-2 border-white" : ""
+                        }`}
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </View>
+                )}
+              </View>
               <View className="flex-row justify-between items-center">
                 <TouchableOpacity
                   onPress={() => setShowPreview(false)}
