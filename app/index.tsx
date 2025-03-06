@@ -12,18 +12,20 @@ const wallets = [
   createWallet("com.trustwallet.app"),
 ];
 
+const chainId = parseInt(process.env.EXPO_PUBLIC_CONTRACT_ADDRESS!, 10);
+
 export default function WelcomeScreen() {
   const account = useActiveAccount();
 
   useEffect(() => {
-    // if (account) {
-    //   router.replace("/(tabs)");
-    // }
+    if (account) {
+      router.replace("/(tabs)");
+    }
 
     // For development purposes
-    setTimeout(() => {
-      router.replace("/(tabs)");
-    }, 600);
+    // setTimeout(() => {
+    //   router.replace("/(tabs)");
+    // }, 600);
   }, [account]);
 
   return (
@@ -45,7 +47,7 @@ export default function WelcomeScreen() {
             },
           })}
           wallets={wallets}
-          chain={defineChain(52014)}
+          chain={defineChain(chainId)}
         />
       </View>
     </View>
