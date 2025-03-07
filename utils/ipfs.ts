@@ -8,7 +8,7 @@ interface IPFSMetadata {
   }>;
 }
 
-export const uploadToIPFS = async (uri: string): Promise<string> => {
+export const uploadToIPFS = async (name: string, uri: string): Promise<string> => {
   try {
     const pinataJWT = process.env.EXPO_PUBLIC_PINATA_JWT;
     if (!pinataJWT) {
@@ -20,7 +20,7 @@ export const uploadToIPFS = async (uri: string): Promise<string> => {
     formData.append("file", {
       uri: uri,
       type: "image/png",
-      name: "walking-path.png",
+      name: name.replace(" #", "-") + ".png",
     } as any);
 
     const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
@@ -47,12 +47,19 @@ export const uploadToIPFS = async (uri: string): Promise<string> => {
   }
 };
 
-export const uploadMetadataToIPFS = async (metadata: IPFSMetadata): Promise<string> => {
+export const uploadMetadataToIPFS = async (name: string, metadata: IPFSMetadata): Promise<string> => {
   try {
     const pinataJWT = process.env.EXPO_PUBLIC_PINATA_JWT;
     if (!pinataJWT) {
       throw new Error("Pinata JWT token is not configured");
     }
+
+    const prepareData = JSON.stringify({
+      pinataContent: metadata,
+      pinataMetadata: {
+        name: name.replace(" #", "-") + ".json",
+      },
+    });
 
     const res = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
       method: "POST",
@@ -60,7 +67,7 @@ export const uploadMetadataToIPFS = async (metadata: IPFSMetadata): Promise<stri
         "Authorization": `Bearer ${pinataJWT}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(metadata),
+      body: prepareData,
     });
 
     if (!res.ok) {

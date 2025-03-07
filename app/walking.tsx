@@ -211,10 +211,11 @@ export default function WalkingScreen() {
 
     try {
       setIsMinting(true);
+      const nextTokenId = await nextTokenIdToMint({contract});
+      const name = "FootFolio #" + (Number(nextTokenId) + 1);
 
       // Upload image to IPFS
-      const imageUri = await uploadToIPFS(previewUri);
-      const nextTokenId = await nextTokenIdToMint({contract});
+      const imageUri = await uploadToIPFS(name, previewUri);
 
       let level;
       if (totalDistance < 2000) {
@@ -231,7 +232,7 @@ export default function WalkingScreen() {
 
       // Create metadata
       const metadata = {
-        name: "FootFolio #" + nextTokenId,
+        name,
         description: `A unique walking path art created on ${new Date().toLocaleDateString()}`,
         image: imageUri,
         attributes: [
@@ -255,9 +256,7 @@ export default function WalkingScreen() {
       };
 
       // Upload metadata to IPFS
-      const metadataUri = await uploadMetadataToIPFS(metadata);
-
-      console.log("Metadata URI:", metadataUri);
+      const metadataUri = await uploadMetadataToIPFS(name, metadata);
 
       const transaction = prepareContractCall({
         contract,
