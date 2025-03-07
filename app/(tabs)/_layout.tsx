@@ -28,24 +28,24 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="walk"
-				options={{
-					title: "Walk",
-					tabBarIcon: ({ color, focused }) => (
-						<TabBarIcon
-							name={focused ? "walk" : "walk-outline"}
-							color={color}
-						/>
-					),
-				}}
-			/>
-			<Tabs.Screen
 				name="rank"
 				options={{
 					title: "Leaderboard",
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon
 							name={focused ? "medal" : "medal-outline"}
+							color={color}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="challenge"
+				options={{
+					title: "Challenge",
+					tabBarIcon: ({ color, focused }) => (
+						<TabBarIcon
+							name={focused ? "walk" : "walk-outline"}
 							color={color}
 						/>
 					),
