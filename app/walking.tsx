@@ -11,6 +11,7 @@ import ViewShot from "react-native-view-shot";
 import { prepareContractCall } from "thirdweb";
 import { uploadToIPFS, uploadMetadataToIPFS } from "@/utils/ipfs";
 import Svg, { Path } from "react-native-svg";
+import { nextTokenIdToMint } from "thirdweb/extensions/erc721";
 
 interface Coordinate {
   latitude: number;
@@ -213,12 +214,24 @@ export default function WalkingScreen() {
 
       // Upload image to IPFS
       const imageUri = await uploadToIPFS(previewUri);
+      const nextTokenId = await nextTokenIdToMint({contract});
 
-      console.log("Image URI:", imageUri);
+      let level;
+      if (totalDistance < 2000) {
+        level = "Leisure Walker";
+      } else if (totalDistance < 5000) {
+        level = "Explorer";
+      } else if (totalDistance < 10000) {
+        level = "Trailblazer";
+      } else if (totalDistance < 20000) {
+        level = "Distance Champion";
+      } else {
+        level = "Marathon Voyager";
+      }
 
       // Create metadata
       const metadata = {
-        name: "FootFolio",
+        name: "FootFolio #" + nextTokenId,
         description: `A unique walking path art created on ${new Date().toLocaleDateString()}`,
         image: imageUri,
         attributes: [
@@ -233,6 +246,10 @@ export default function WalkingScreen() {
           {
             trait_type: "Points",
             value: coordinates.length.toString(),
+          },
+          {
+            trait_type: "Level",
+            value: level,
           },
         ],
       };
@@ -456,9 +473,8 @@ export default function WalkingScreen() {
                           setPathColor(color);
                           setShowColorPicker(false);
                         }}
-                        className={`w-8 h-8 rounded-full ${
-                          pathColor === color ? "border-2 border-white" : ""
-                        }`}
+                        className={`w-8 h-8 rounded-full ${pathColor === color ? "border-2 border-white" : ""
+                          }`}
                         style={{ backgroundColor: color }}
                       />
                     ))}
@@ -532,9 +548,8 @@ export default function WalkingScreen() {
                       <TouchableOpacity
                         key={color}
                         onPress={() => handleBackgroundColorChange(color)}
-                        className={`w-8 h-8 rounded-full ${
-                          previewBackgroundColor === color ? "border-2 border-white" : ""
-                        }`}
+                        className={`w-8 h-8 rounded-full ${previewBackgroundColor === color ? "border-2 border-white" : ""
+                          }`}
                         style={{ backgroundColor: color }}
                       />
                     ))}

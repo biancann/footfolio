@@ -110,7 +110,7 @@ export default function ProfileScreen() {
                     <Text className="text-white/50 text-sm">Total NFTs</Text>
                   </View>
                   <View>
-                    <Text className="font-bold text-xl text-white">{stats.totalDistance}</Text>
+                    <Text className="font-bold text-xl text-white">{parseFloat(stats.totalDistance.toFixed(2))} km</Text>
                     <Text className="text-white/50 text-sm">Total Distance</Text>
                   </View>
                   <View>
