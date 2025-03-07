@@ -109,14 +109,14 @@ export default function ProfileScreen() {
   return (
     <SafeAreaProvider>
       <ScrollView
-        className="h-full"
+        className="h-full bg-dark"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor="#ffffff"
-            colors={["#ffffff"]}
-            progressBackgroundColor="#000000"
+            colors={["#ffd772"]}
+            progressBackgroundColor="#1d3f50"
           />
         }
       >
