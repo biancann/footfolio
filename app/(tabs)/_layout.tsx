@@ -42,10 +42,22 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="rank"
 				options={{
-					title: "Rank",
+					title: "Leaderboard",
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon
 							name={focused ? "medal" : "medal-outline"}
+							color={color}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="profile"
+				options={{
+					title: "Profile",
+					tabBarIcon: ({ color, focused }) => (
+						<TabBarIcon
+							name={focused ? "person" : "person-outline"}
 							color={color}
 						/>
 					),
