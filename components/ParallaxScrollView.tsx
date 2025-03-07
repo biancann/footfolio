@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactElement } from "react";
-import { StyleSheet, useColorScheme } from "react-native";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import Animated, {
 	interpolate,
 	useAnimatedRef,
@@ -7,9 +7,7 @@ import Animated, {
 	useScrollViewOffset,
 } from "react-native-reanimated";
 
-import { ThemedView } from "@/components/ThemedView";
-
-const HEADER_HEIGHT = 200;
+const HEADER_HEIGHT = 240;
 
 type Props = PropsWithChildren<{
 	headerImage: ReactElement;
@@ -47,7 +45,7 @@ export function ParallaxScrollView({
 	});
 
 	return (
-		<ThemedView style={styles.container}>
+		<View className="flex bg-dark min-h-screen">
 			<Animated.ScrollView ref={scrollRef} scrollEventThrottle={16}>
 				<Animated.View
 					style={[
@@ -58,9 +56,9 @@ export function ParallaxScrollView({
 				>
 					{headerImage}
 				</Animated.View>
-				<ThemedView style={styles.content}>{children}</ThemedView>
+				<View className="flex overflow-hidden">{children}</View>
 			</Animated.ScrollView>
-		</ThemedView>
+		</View>
 	);
 }
 
