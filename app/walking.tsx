@@ -41,6 +41,7 @@ export default function WalkingScreen() {
   } | null>(null);
   const [previewBackground, setPreviewBackground] = useState<'solid' | 'dimmed'>('dimmed');
   const [previewBackgroundColor, setPreviewBackgroundColor] = useState('#FFFFFF');
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Request location permissions and get initial location
   useEffect(() => {
@@ -257,7 +258,7 @@ export default function WalkingScreen() {
   };
 
   // Available path colors
-  const colors = ["#00ff00", "#ff0000", "#0000ff", "#ffff00", "#ff00ff"];
+  const colors = ["#ffd772", "#729aff", "#ff9172", "#9aff72", "#72ffd7"];
 
   // Add this new function to handle background changes
   const handleBackgroundChange = async (type: 'solid' | 'dimmed') => {
@@ -348,7 +349,7 @@ export default function WalkingScreen() {
                   <Polyline
                     coordinates={coordinates}
                     strokeColor={pathColor}
-                    strokeWidth={3}
+                    strokeWidth={5}
                   />
                 )}
               </MapView>
@@ -408,7 +409,7 @@ export default function WalkingScreen() {
                                   : `${path} L ${point.x} ${point.y}`;
                               }, '')}
                               stroke={pathColor}
-                              strokeWidth={5}
+                              strokeWidth={8}
                               fill="none"
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -439,23 +440,37 @@ export default function WalkingScreen() {
         <SafeAreaView className="absolute bottom-0 w-full">
           <View className="flex-row items-center justify-between bg-black/50 backdrop-blur-md p-4 mx-4 mb-4 rounded-full">
             {/* Color picker */}
-            <View className="flex-row gap-2">
-              {colors.map((color) => (
-                <TouchableOpacity
-                  key={color}
-                  onPress={() => setPathColor(color)}
-                  className={`w-8 h-8 rounded-full ${
-                    pathColor === color ? "border-2 border-white" : ""
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
+            <View className="relative">
+              <TouchableOpacity
+                onPress={() => setShowColorPicker(!showColorPicker)}
+                className="w-8 h-8 rounded-full border-2 border-white"
+                style={{ backgroundColor: pathColor }}
+              />
+              {showColorPicker && (
+                <View className="absolute bottom-7 -left-2 mb-2 bg-dark backdrop-blur-md p-2 rounded-full">
+                  <View className="flex-col gap-2">
+                    {colors.map((color) => (
+                      <TouchableOpacity
+                        key={color}
+                        onPress={() => {
+                          setPathColor(color);
+                          setShowColorPicker(false);
+                        }}
+                        className={`w-8 h-8 rounded-full ${
+                          pathColor === color ? "border-2 border-white" : ""
+                        }`}
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
             </View>
 
             {/* Play/Pause button */}
             <TouchableOpacity
               onPress={toggleTracking}
-              className="bg-blue-500 w-12 h-12 rounded-full items-center justify-center"
+              className="bg-primary-600 w-12 h-12 rounded-full items-center justify-center ml-6"
             >
               <Ionicons
                 name={isTracking ? "pause" : "play"}
