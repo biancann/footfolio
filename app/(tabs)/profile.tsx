@@ -164,7 +164,14 @@ export default function ProfileScreen() {
                 },
               })}
               wallets={wallets}
-              chain={defineChain(chainId)}
+              chain={defineChain({
+                id: chainId,
+                rpc: process.env.EXPO_PUBLIC_RPC_URL,
+                nativeCurrency: {
+                  name: "Electroneum",
+                  symbol: "ETN",
+                }
+              })}
             />
           </View>
 
