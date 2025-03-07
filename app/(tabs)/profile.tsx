@@ -3,12 +3,20 @@ import React, { useEffect, useState } from "react";
 import { View, Image, Text, ScrollView, RefreshControl, TouchableOpacity, Linking } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { tokensOfOwner, tokenURI } from "thirdweb/extensions/erc721";
-import { useActiveAccount } from "thirdweb/react";
-import { contract } from "@/constants/thirdweb";
+import { ConnectButton, darkTheme, useActiveAccount } from "thirdweb/react";
+import { client, contract } from "@/constants/thirdweb";
 import { createShimmerPlaceholder } from 'react-native-shimmer-placeholder'
 import { LinearGradient } from 'expo-linear-gradient';
+import { createWallet } from "thirdweb/wallets";
+import { defineChain } from "thirdweb";
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient)
+const chainId = parseInt(process.env.EXPO_PUBLIC_CONTRACT_ADDRESS!, 10);
+const wallets = [
+  createWallet("io.metamask"),
+  createWallet("me.rainbow"),
+  createWallet("com.trustwallet.app"),
+];
 
 export default function ProfileScreen() {
   const account = useActiveAccount();
@@ -117,16 +125,13 @@ export default function ProfileScreen() {
             <Text className="text-2xl font-bold text-white">Profile</Text>
           </View>
 
-          <View className="px-5 mb-2">
-            <View className="flex flex-row items-center mb-6">
+          <View className="px-5 mb-4">
+            <View className="flex flex-row items-center mb-4">
               <Image
                 source={{ uri: `https://api.dicebear.com/9.x/thumbs/png?seed=${account?.address}&size=128&shapeColor=fff9eb,ffd772,f98b07&backgroundColor=1d3f50` }}
                 className="w-20 h-20 rounded-full bg-gray-800"
               />
               <View className="ml-4 flex-1">
-                <Text className="text-lg text-primary font-bold mb-2">
-                  {account ? `${account.address.slice(0, 6)}...${account.address.slice(-4)}` : "Not connected"}
-                </Text>
                 <View className="flex flex-row items-center gap-5">
                   <View>
                     <ShimmerPlaceholder visible={!isLoading} width={60} height={25} shimmerColors={["#001a26", "#1d3f50", "#355e75"]}>
@@ -149,6 +154,18 @@ export default function ProfileScreen() {
                 </View>
               </View>
             </View>
+            <ConnectButton
+              client={client}
+              theme={darkTheme({
+                colors: {
+                  primaryButtonBg: "#0f2d3c",
+                  primaryButtonText: "#fff9eb",
+                  modalBg: "#0f2d3c",
+                },
+              })}
+              wallets={wallets}
+              chain={defineChain(chainId)}
+            />
           </View>
 
           <View className="px-5 pb-5">
