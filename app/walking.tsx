@@ -12,6 +12,7 @@ import { prepareContractCall } from "thirdweb";
 import { uploadToIPFS, uploadMetadataToIPFS } from "@/utils/ipfs";
 import Svg, { Path } from "react-native-svg";
 import { nextTokenIdToMint } from "thirdweb/extensions/erc721";
+import Toast from 'react-native-toast-message';
 
 interface Coordinate {
   latitude: number;
@@ -185,7 +186,7 @@ export default function WalkingScreen() {
 
         setLocation(location);
       } catch (error) {
-        console.error("Error getting location:", error);
+        // console.error("Error getting location:", error);
         setErrorMsg("Error getting location. Please try again.");
       }
     })();
@@ -272,7 +273,7 @@ export default function WalkingScreen() {
     if (viewShotRef.current?.capture) {
       try {
         if (coordinates.length === 0) {
-          console.error("No coordinates to capture");
+          // console.error("No coordinates to capture");
           return;
         }
 
@@ -311,15 +312,28 @@ export default function WalkingScreen() {
         setPreviewUri(uri);
         setShowPreview(true);
       } catch (error) {
-        console.error("Error capturing preview:", error);
+        // console.error("Error capturing preview:", error);
       }
     }
   };
 
   // Mint NFT
   const mintNFT = async () => {
-    if (!previewUri || !account) {
-      console.error("Cannot mint: No preview URI or no account connected");
+    if (!previewUri) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No preview image available',
+      });
+      return;
+    }
+
+    if (!account) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please connect your wallet first',
+      });
       return;
     }
 
@@ -377,11 +391,35 @@ export default function WalkingScreen() {
         method: "function mint(string token, string tokenURI)",
         params: [process.env.EXPO_PUBLIC_SECRET_TOKEN!, metadataUri],
       });
+
       await sendTransaction(transaction);
       setShowPreview(false);
-      console.log("Successfully minted NFT");
+      Toast.show({
+        type: 'success',
+        text1: 'Your NFT has been minted successfully',
+        text2: 'Refresh this page in a few minutes',
+      });
+      router.replace("/(tabs)/profile");
     } catch (error) {
-      console.error("Error minting NFT:", error);
+      // console.error("Error minting NFT:", error);
+      let errorMessage = 'Failed to mint NFT. Please try again.';
+
+      if (error instanceof Error) {
+        // Handle specific error cases
+        if (error.message.includes('insufficient funds')) {
+          errorMessage = 'Insufficient funds to mint NFT';
+        } else if (error.message.includes('user rejected')) {
+          errorMessage = 'Transaction was rejected';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection';
+        }
+      }
+
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: errorMessage,
+      });
     } finally {
       setIsMinting(false);
     }
@@ -659,7 +697,7 @@ export default function WalkingScreen() {
                 </TouchableOpacity>
                 {previewBackground === 'solid' && (
                   <View className="flex-row gap-2">
-                    {['#FFFFFF', '#000000', '#1A1A1A'].map((color) => (
+                    {['#fff9eb', '#001a26'].map((color) => (
                       <TouchableOpacity
                         key={color}
                         onPress={() => handleBackgroundColorChange(color)}

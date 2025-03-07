@@ -188,7 +188,7 @@ export default function ProfileScreen() {
                 >
                   <Image
                     source={{ uri: n.image }}
-                    className="rounded-lg w-full h-full"
+                    className="rounded-lg w-full h-full border border-white/10"
                   />
                 </TouchableOpacity>
               ))}
