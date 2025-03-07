@@ -110,8 +110,8 @@ export default function WalkingScreen() {
     },
     {
       featureType: "road",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#9ca5b3" }],
+      elementType: "labels",
+      stylers: [{ visibility: "off" }],
     },
     {
       featureType: "road.highway",
@@ -125,8 +125,8 @@ export default function WalkingScreen() {
     },
     {
       featureType: "road.highway",
-      elementType: "labels.text.fill",
-      stylers: [{ color: "#f3d19c" }],
+      elementType: "labels",
+      stylers: [{ visibility: "off" }],
     },
     {
       featureType: "transit",
