@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList } from "react-native";
+import { View, FlatList, Text, Image } from "react-native";
 import { tokenURI, ownerOf, nextTokenIdToMint } from "thirdweb/extensions/erc721";
 import { contract } from "@/constants/thirdweb";
-import { ThemedText } from "./ThemedText";
-import { ThemedView } from "./ThemedView";
 
 interface RankData {
   rank: number;
@@ -89,36 +87,27 @@ export function RankList() {
   }, []);
 
   const renderItem = ({ item }: { item: RankData }) => (
-    <ThemedView className="p-4 mb-2 rounded-xl">
-      <View className="flex-row justify-between items-center">
-        <View className="flex-row items-center space-x-4">
-          <ThemedText className="text-lg font-bold">#{item.rank}</ThemedText>
-          <ThemedText className="text-base">
-            {item.address.slice(0, 6)}...{item.address.slice(-4)}
-          </ThemedText>
-        </View>
-        <View className="flex-row space-x-4">
-          <ThemedText className="text-base">{item.totalDistance.toFixed(2)} km</ThemedText>
-          <ThemedText className="text-base font-bold">{item.totalPoints} pts</ThemedText>
-        </View>
+    <View className="flex-row justify-between items-center">
+      <Text className="text-2xl font-bold text-primary shrink-0 w-10">{item.rank}</Text>
+      <View className="flex-row items-center gap-4 bg-dark-800 flex-1 rounded-full pl-3 pr-5 py-2 border border-dark-700">
+        <Image
+          source={{ uri: `https://api.dicebear.com/9.x/thumbs/png?seed=${item.address}&size=128&shapeColor=fff9eb,ffd772,f98b07&backgroundColor=1d3f50` }}
+          className="w-10 h-10 rounded-full bg-gray-800 shrink-0"
+        />
+        <Text className="text-base text-white flex-1">
+          {item.address.slice(0, 6)}...{item.address.slice(-4)}
+        </Text>
+        <Text className="text-base font-bold text-white shrink-0">{item.totalPoints} pts</Text>
       </View>
-    </ThemedView>
+    </View>
   );
-
-  if (isLoading) {
-    return (
-      <ThemedView className="p-4 rounded-xl">
-        <ThemedText>Loading ranks...</ThemedText>
-      </ThemedView>
-    );
-  }
 
   return (
     <FlatList
       data={ranks}
       renderItem={renderItem}
       keyExtractor={(item) => item.address}
-      contentContainerClassName="p-4"
+      contentContainerClassName="px-5"
       showsVerticalScrollIndicator={false}
     />
   );
