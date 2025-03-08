@@ -1,89 +1,100 @@
-![Banner](https://github.com/thirdweb-example/thirdweb-auth-express/assets/17715009/06383e68-9c65-4265-8505-e88e573443f9)
-# thirdweb expo starter
+![Banner](https://raw.githubusercontent.com/biancann/footfolio/refs/heads/main/assets/images/title.png)
 
-Starter template to build an onchain react native app with [thirdweb](https://thirdweb.com/) and [expo](https://expo.dev/).
+# FootFolio - Transform Your Walks into NFT Art
 
-### Features
+FootFolio is an innovative mobile application that transforms your daily walks into unique digital artworks that you can mint as NFTs. By combining fitness tracking with blockchain technology, FootFolio encourages a healthier lifestyle while creating lasting memories of your journeys.
 
-- in-app wallets using phone number, email or social logins to create a wallet for the user
-- smart accounts to sponsor gas
-- connecting to external wallets like MetaMask via WalletConnect
-- autoconnecting to the last connected wallet on launch
-- reading contract state and events
-- writing to the blockchain
+## Features
+
+### 🚶‍♂️ Walk Tracking
+- Real-time GPS tracking of your walking path
+- Live path visualization on an interactive map
+
+### 🎨 Art Generation
+- Convert walking paths into beautiful digital art
+- Multiple visualization styles
+- Customizable path colors and backgrounds
+
+### 🌟 NFT Creation
+- Mint your walking path art as unique NFTs
+- Include metadata such as:
+  - Total distance covered
+  - Duration of walk
+  - Date and time
+  - Achievement points
+- View your NFT collection in-app
+
+### 🏆 Achievements & Leaderboard
+- Earn points for consistent walking
+- Compare achievements with other users
+- Track personal records and milestones
+- View global leaderboard rankings
+
+## Tech Stack
+
+- **Frontend**: React Native with Expo
+- **Styling**: NativeWind (Tailwind CSS for React Native)
+- **Blockchain**: Electroneum
+- **Maps**: React Native Maps
+- **Location**: Expo Location
+
+## Prerequisites
+
+Before you begin, ensure you have the following:
+- Node.js (v16 or higher)
+- Yarn package manager
+- Expo CLI
+- iOS Simulator or Android Emulator
+- thirdweb API key
+- Pinata IPFS account for NFT storage
 
 ## Installation
 
-Install the template using [thirdweb create](https://portal.thirdweb.com/cli/create)
-
+1. Clone the repository
 ```bash
-  npx thirdweb create app --expo
+git clone https://github.com/biancann/footfolio
+cd footfolio
 ```
 
-## Get started
-
-1. Install dependencies
-
+2. Install dependencies
 ```bash
 yarn install
 ```
 
-2. Get your thirdweb client id
+3. Environment Setup
 
-Rename the `.env.example` file to `.env` and paste in your thirdweb client id.
+Copy `.env.example` to `.env` and fill in the required values:
+```env
+EXPO_PUBLIC_THIRDWEB_CLIENT_ID=      # Your thirdweb client ID
+EXPO_PUBLIC_PINATA_JWT=              # Pinata JWT for IPFS storage
+EXPO_PUBLIC_PINATA_GATEWAY=          # Pinata gateway URL
+EXPO_PUBLIC_CHAIN_ID=                # Blockchain network ID, 52014 for Electroneum Mainnet or 5201420 for Electroneum Testnet
+EXPO_PUBLIC_CONTRACT_ADDRESS=        # NFT contract address
+EXPO_PUBLIC_SECRET_TOKEN=            # Secret token for minting
+EXPO_PUBLIC_RPC_URL=                 # RPC URL for the blockchain
+```
 
-You can obtain a free client id from the [thirdweb dashboard](https://thirdweb.com/dashboard/settings).
-
-3. Prebuild the ios and android directories
-
-
-> [!IMPORTANT]  
-> The thirdweb SDK uses native modules, which means it cannot run on expo GO. You must build the ios and android apps to link the native modules.
-
+4. Prebuild the native modules
 ```bash
 npx expo prebuild
 ```
 
-This will create the `ios` and `android` directories.
-
-4. Start the app
-
+5. Start the development server
 ```bash
+# For iOS
 yarn ios
-```
 
-or
-
-```bash
+# For Android
 yarn android
 ```
-
-To run this app, you'll need either:
-
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 
 ## Troubleshooting
 
 ### OpenSSL Error on Xcode 16
 
-If using xcode 16, you may encounter a OpenSSL error when trying to build the app. This is because xcode 16 requires a newer version of OpenSSL than the one specified in the current app.json.
+If using Xcode 16, you may encounter an OpenSSL error. To fix this:
 
-To fix this, change the version of OpenSSL specified in the `app.json` file to `3.3.2000`.
-
-- Open the `app.json` file
-- Find the `ios` > `extraPods` section
-- Set `"version": "3.3.2000"` for the `OpenSSL-Universal` pod
-- Save the file
-
-Then run `npx expo prebuild` to update the native modules with the new OpenSSL version and run the app again.
-
-## Additional Resources
-
-- [Documentation](https://portal.thirdweb.com/typescript/v5)
-- [Templates](https://thirdweb.com/templates)
-- [YouTube](https://www.youtube.com/c/thirdweb)
-
-## Support
-
-For help or feedback, please [visit our support site](https://thirdweb.com/support)
+1. Open `app.json`
+2. Find the `ios` > `extraPods` section
+3. Set `"version": "3.3.2000"` for the `OpenSSL-Universal` pod
+4. Run `npx expo prebuild`
