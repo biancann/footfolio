@@ -5,19 +5,19 @@
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/images/icon.png",
-		"scheme": "com.thirdweb.demo",
+		"scheme": "com.footfolio.app",
 		"userInterfaceStyle": "automatic",
 		"splash": {
 			"image": "./assets/images/splash.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
+			"backgroundColor": "#001a26"
 		},
 		"assetBundlePatterns": [
 			"**/*"
 		],
 		"ios": {
 			"supportsTablet": true,
-			"bundleIdentifier": "com.thirdweb.demo",
+			"bundleIdentifier": "com.footfolio.app",
 			"config": {
 				"googleMapsApiKey": "AIzaSyCnCAg3nejbmKXEtk3gvrucyA-13FtaXTk"
 			},
@@ -31,7 +31,7 @@
 				"foregroundImage": "./assets/images/adaptive-icon.png",
 				"backgroundColor": "#ffffff"
 			},
-			"package": "com.thirdweb.demo",
+			"package": "com.footfolio.app",
 			"config": {
 				"googleMaps": {
 					"apiKey": "AIzaSyCnCAg3nejbmKXEtk3gvrucyA-13FtaXTk"

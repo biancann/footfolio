@@ -9,6 +9,8 @@ import { createShimmerPlaceholder } from 'react-native-shimmer-placeholder'
 import { LinearGradient } from 'expo-linear-gradient';
 import { createWallet } from "thirdweb/wallets";
 import { defineChain } from "thirdweb";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient)
 const chainId = parseInt(process.env.EXPO_PUBLIC_CONTRACT_ADDRESS!, 10);
@@ -28,6 +30,7 @@ export default function ProfileScreen() {
     totalDistance: 0,
     totalPoints: 0,
   });
+  const router = useRouter();
 
   const fetchStats = async () => {
     if (!account) {
@@ -176,23 +179,36 @@ export default function ProfileScreen() {
           </View>
 
           <View className="px-5 pb-5">
-            <View className="flex flex-row flex-wrap -mx-1">
-              {nfts.map((n) => (
+            {nfts.length === 0 ? (
+              <View className="bg-dark-800/50 backdrop-blur-md p-8 rounded-xl items-center">
+                <Ionicons name="images-outline" size={48} color="rgba(255,255,255,0.5)" />
+                <Text className="text-white/50 text-base mt-3 text-center">No NFTs in your collection yet.{"\n"}Start walking to earn your first NFT!</Text>
                 <TouchableOpacity
-                  key={n.tokenId}
-                  className="w-1/3 aspect-square p-1"
-                  onPress={() => {
-                    const url = `https://blockexplorer.electroneum.com/token/${contract.address}/instance/${n.tokenId}`;
-                    Linking.openURL(url);
-                  }}
+                  onPress={() => router.push("/walking")}
+                  className="mt-4 bg-primary-600 px-6 py-3 rounded-full"
                 >
-                  <Image
-                    source={{ uri: n.image }}
-                    className="rounded-lg w-full h-full border border-white/10"
-                  />
+                  <Text className="text-white font-semibold">Start Walking</Text>
                 </TouchableOpacity>
-              ))}
-            </View>
+              </View>
+            ) : (
+              <View className="flex flex-row flex-wrap -mx-1">
+                {nfts.map((n) => (
+                  <TouchableOpacity
+                    key={n.tokenId}
+                    className="w-1/3 aspect-square p-1"
+                    onPress={() => {
+                      const url = `https://blockexplorer.electroneum.com/token/${contract.address}/instance/${n.tokenId}`;
+                      Linking.openURL(url);
+                    }}
+                  >
+                    <Image
+                      source={{ uri: n.image }}
+                      className="rounded-lg w-full h-full border border-white/10"
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>

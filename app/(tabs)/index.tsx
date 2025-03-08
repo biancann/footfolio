@@ -240,23 +240,30 @@ export default function HomeScreen() {
         {/* Recent Activities */}
         <View className="mb-6">
           <Text className="text-xl font-bold text-white mb-4">Recent Activities</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {recentActivities.map((activity) => (
-              <TouchableOpacity
-                key={activity.tokenId}
-                className="bg-dark-800/50 backdrop-blur-md p-4 rounded-xl mr-4 w-40"
-                onPress={() => router.push("/profile")}
-              >
-                <Image
-                  source={{ uri: activity.image }}
-                  className="w-full h-32 rounded-lg mb-2"
-                />
-                <Text className="text-white font-semibold">{activity.name}</Text>
-                <Text className="text-white/50 text-sm">{activity.distance.toFixed(2)} km</Text>
-                <Text className="text-white/50 text-sm">{activity.date}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          {recentActivities.length === 0 ? (
+            <View className="bg-dark-800/50 backdrop-blur-md p-6 rounded-xl items-center">
+              <Ionicons name="walk-outline" size={48} color="rgba(255,255,255,0.5)" />
+              <Text className="text-white/50 text-base mt-2 text-center">No activities yet.{"\n"}Start walking to earn your first NFT!</Text>
+            </View>
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {recentActivities.map((activity) => (
+                <TouchableOpacity
+                  key={activity.tokenId}
+                  className="bg-dark-800/50 backdrop-blur-md p-4 rounded-xl mr-4 w-40"
+                  onPress={() => router.push("/profile")}
+                >
+                  <Image
+                    source={{ uri: activity.image }}
+                    className="w-full h-32 rounded-lg mb-2"
+                  />
+                  <Text className="text-white font-semibold">{activity.name}</Text>
+                  <Text className="text-white/50 text-sm">{activity.distance.toFixed(2)} km</Text>
+                  <Text className="text-white/50 text-sm">{activity.date}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
         </View>
 
         {/* Leaderboard Preview */}
