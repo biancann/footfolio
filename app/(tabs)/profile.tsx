@@ -131,7 +131,7 @@ export default function ProfileScreen() {
           <View className="px-5 mb-4">
             <View className="flex flex-row items-center mb-4">
               <Image
-                source={{ uri: `https://api.dicebear.com/9.x/thumbs/png?seed=${account?.address}&size=128&shapeColor=fff9eb,ffd772,f98b07&backgroundColor=1d3f50` }}
+                source={{ uri: `https://api.dicebear.com/9.x/thumbs/png?seed=${account?.address}&size=128&shapeColor=fff9eb,ffd772&&backgroundColor=1d3f50` }}
                 className="w-20 h-20 rounded-full bg-gray-800"
               />
               <View className="ml-4 flex-1">
